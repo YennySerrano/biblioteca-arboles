@@ -3,14 +3,15 @@
 <head th:replace="~{fragments/head :: head}"></head>
 <body>
 <header th:replace="~{fragments/nav :: nav}"></header>
+
 <main class="container">
-    <h1>Libros</h1>
+    <h1>Gestión de Libros</h1>
 
     <div th:if="${mensaje}" class="alert alert-ok" th:text="${mensaje}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
     <section class="panel">
-        <h2>Buscar</h2>
+        <h2>Buscar en Catálogo</h2>
         <form class="search-form" th:action="@{/libros}" method="get">
             <input type="search" name="q" th:value="${q}" placeholder="Título o autor…">
             <button type="submit" class="btn btn-secondary">Buscar</button>
@@ -19,7 +20,7 @@
     </section>
 
     <section class="panel">
-        <h2>Agregar libro</h2>
+        <h2>Agregar nuevo libro</h2>
         <form class="inline-form" th:action="@{/libros}" method="post">
             <input type="text" name="titulo" placeholder="Título" required>
             <input type="text" name="autor" placeholder="Autor" required>
@@ -28,31 +29,71 @@
     </section>
 
     <section class="panel">
-        <h2>Listado</h2>
+        <h2>Listado de Libros</h2>
         <div class="table-wrap">
             <table>
                 <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Estado</th>
-                    <th>Prestado a</th>
-                </tr>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Estado</th>
+                        <th>Prestado a</th>
+                        <th>Acciones</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr th:each="libro : ${libros}">
-                    <td th:text="${libro.titulo}">—</td>
-                    <td th:text="${libro.autor}">—</td>
-                    <td th:text="${libro.disponible ? 'Disponible' : 'Prestado'}">—</td>
-                    <td th:text="${libro.textoPrestatario}">—</td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(libros)}">
-                    <td colspan="4" class="empty">No hay libros que coincidan.</td>
-                </tr>
+                    <tr th:each="libro : ${libros}">
+                        <td th:text="${libro.titulo}">—</td>
+                        <td th:text="${libro.autor}">—</td>
+                        <td>
+                            <span th:text="${libro.disponible ? 'Disponible' : 'Prestado'}"
+                                  th:style="${libro.disponible ? 'color: green; font-weight: bold;' : 'color: red;'}">
+                            </span>
+                        </td>
+                        <td th:text="${libro.textoPrestatario}">—</td>
+                        <td>
+                            <div th:if="${libro.disponible}">
+                                <form th:action="@{/libros/prestar}" method="post" style="display: flex; gap: 5px; align-items: center;">
+                                    <input type="hidden" name="tituloLibro" th:value="${libro.titulo}">
+                                    
+                                    <input type="text" name="usuarioId" 
+                                           placeholder="ID del usuario..." 
+                                           list="usuariosList" 
+                                           required 
+                                           style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 160px;">
+                                    
+                                    <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Prestar</button>
+                                </form>
+                            </div>
+                            
+                            <div th:unless="${libro.disponible}">
+                                <form th:action="@{/libros/devolver}" method="post" style="display: inline-block;">
+                                    <input type="hidden" name="tituloLibro" th:value="${libro.titulo}">
+                                    <button type="submit" class="btn btn-danger" 
+                                            style="padding: 5px 15px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                        Devolver Libro
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(libros)}">
+                        <td colspan="5" class="empty" style="text-align: center; padding: 20px; color: #666;">
+                            No hay libros que coincidan con la búsqueda.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </section>
 </main>
+
+<datalist id="usuariosList">
+    <option th:each="u : ${usuarios}" 
+            th:value="${u.id}" 
+            th:text="${u.nombre}">
+    </option>
+</datalist>
+
 </body>
 </html>

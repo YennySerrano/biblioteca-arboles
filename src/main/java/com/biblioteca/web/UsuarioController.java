@@ -1,12 +1,13 @@
 package com.biblioteca.web;
 
-import com.biblioteca.servicio.BibliotecaServicio;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.biblioteca.servicio.BibliotecaServicio;
 
 @Controller
 public class UsuarioController {
@@ -29,7 +30,9 @@ public class UsuarioController {
             @RequestParam String nombre,
             @RequestParam String id,
             RedirectAttributes redirectAttributes) {
+        
         String err = bibliotecaServicio.agregarUsuario(nombre, id);
+        
         if (err != null) {
             redirectAttributes.addFlashAttribute("error", err);
         } else {
@@ -42,6 +45,7 @@ public class UsuarioController {
     public String eliminarUsuario(
             @RequestParam String id,
             RedirectAttributes redirectAttributes) {
+        
         String err = bibliotecaServicio.eliminarUsuario(id);
         if (err != null) {
             redirectAttributes.addFlashAttribute("error", err);

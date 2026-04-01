@@ -2,8 +2,8 @@ package com.biblioteca.modelo;
 
 public class Libro {
 
-    private String titulo;
-    private String autor;
+    private final String titulo; 
+    private final String autor;
     private boolean disponible;
     private Usuario prestadoA;
 
@@ -38,15 +38,14 @@ public class Libro {
     }
 
     public void prestarA(Usuario usuario) {
-        if (!disponible) {
-            return;
+        if (disponible) {
+            this.disponible = false;
+            this.prestadoA = usuario;
         }
-        disponible = false;
-        prestadoA = usuario;
     }
 
     public void devolver() {
-        disponible = true;
-        prestadoA = null;
+        this.disponible = true;
+        this.prestadoA = null;
     }
 }

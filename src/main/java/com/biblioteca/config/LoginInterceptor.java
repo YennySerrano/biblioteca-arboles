@@ -1,10 +1,11 @@
 package com.biblioteca.config;
 
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -16,6 +17,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             throws Exception {
         String uri = request.getRequestURI();
         if (uri.startsWith(request.getContextPath() + "/css")
+                || uri.startsWith(request.getContextPath() + "/images") 
                 || uri.startsWith(request.getContextPath() + "/webjars")
                 || uri.endsWith(".ico")
                 || uri.contains("/error")) {

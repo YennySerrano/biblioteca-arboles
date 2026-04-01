@@ -273,3 +273,13 @@ td.empty {
     width: 100%;
     margin-top: 8px;
 }
+.login-logo {
+    max-width: 130px; /* Esto evita que el logo crezca de más */
+    height: auto;
+    display: block;
+    margin: 0 auto 15px auto; /* Lo centra y le da espacio abajo */
+}
+
+.login-card {
+    padding: 30px; /* Un poco más de espacio interno para que no se vea apretado */
+}

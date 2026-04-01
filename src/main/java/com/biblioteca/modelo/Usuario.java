@@ -4,8 +4,8 @@ public class Usuario {
 
     private static final int MAX_LIBROS = 2;
 
-    private String nombre;
-    private String id;
+    private final String nombre; 
+    private final String id;
     private final Libro[] prestamosActivos;
     private int numPrestamos;
 
@@ -33,16 +33,13 @@ public class Usuario {
     }
 
     public void registrarPrestamo(Libro libro) {
-        if (numPrestamos >= MAX_LIBROS || libro == null) {
-            return;
+        if (numPrestamos < MAX_LIBROS && libro != null) {
+            prestamosActivos[numPrestamos++] = libro;
         }
-        prestamosActivos[numPrestamos++] = libro;
     }
 
     public void liberarPrestamo(Libro libro) {
-        if (libro == null) {
-            return;
-        }
+        if (libro == null) return;
         for (int i = 0; i < numPrestamos; i++) {
             if (prestamosActivos[i] == libro) {
                 prestamosActivos[i] = prestamosActivos[numPrestamos - 1];
