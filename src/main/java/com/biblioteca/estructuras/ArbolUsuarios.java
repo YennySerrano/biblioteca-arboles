@@ -6,7 +6,7 @@ public class ArbolUsuarios {
 
     private NodoUsuario raiz;
 
-    // 🔹 INSERTAR USUARIO
+    // INSERTAR USUARIO
     public void insertar(Usuario usuario) {
         raiz = insertarRec(raiz, usuario);
     }
@@ -25,7 +25,7 @@ public class ArbolUsuarios {
         return nodo;
     }
 
-    // 🔹 BUSCAR USUARIO
+    // BUSCAR USUARIO
     public Usuario buscar(String id) {
         return buscarRec(raiz, id);
     }

@@ -6,7 +6,7 @@ public class ArbolLibros {
 
     private NodoLibro raiz;
 
-    // 🔹 INSERTAR
+    // INSERTAR
     public void insertar(Libro libro) {
         raiz = insertarRec(raiz, libro);
     }
@@ -25,7 +25,7 @@ public class ArbolLibros {
         return nodo;
     }
 
-    // 🔹 BUSCAR
+    // BUSCAR
     public Libro buscar(String titulo) {
         return buscarRec(raiz, titulo);
     }

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.biblioteca.estructuras.ArbolLibros;
-import com.biblioteca.estructuras.ArbolUsuarios; // 🔥 NUEVO
+import com.biblioteca.estructuras.ArbolUsuarios;
 import com.biblioteca.modelo.Libro;
 import com.biblioteca.modelo.Usuario;
 
@@ -73,7 +73,7 @@ public class BibliotecaServicio {
         Usuario nuevo = new Usuario(n, i);
         usuarios.add(nuevo);
 
-        arbolUsuarios.insertar(nuevo); // 🔥 ÁRBOL USUARIOS
+        arbolUsuarios.insertar(nuevo); 
 
         return null;
     }
@@ -118,7 +118,7 @@ public class BibliotecaServicio {
         Libro nuevo = new Libro(t, a);
 
         libros.add(nuevo);
-        arbolLibros.insertar(nuevo); // 🔥 ÁRBOL LIBROS
+        arbolLibros.insertar(nuevo);
 
         return null;
     }
@@ -135,7 +135,6 @@ public class BibliotecaServicio {
                 .collect(Collectors.toList());
     }
 
-    // 🔥 AHORA USA ÁRBOL DE LIBROS
     public Libro buscarLibroPorTitulo(String titulo) {
         return arbolLibros.buscar(titulo);
     }
@@ -209,7 +208,7 @@ public class BibliotecaServicio {
         Libro libro = new Libro(t, a);
 
         libros.add(libro);
-        arbolLibros.insertar(libro); // 🔥 IMPORTANTE
+        arbolLibros.insertar(libro);
     }
 
     private Usuario registrarUsuarioInterno(String n, String i) {

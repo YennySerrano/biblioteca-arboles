@@ -24,7 +24,7 @@ public class ArbolCategorias {
         return nodo;
     }
 
-    // 🔹 BUSCAR
+    //  BUSCAR
     public boolean buscar(String categoria) {
         return buscarRec(raiz, categoria);
     }
