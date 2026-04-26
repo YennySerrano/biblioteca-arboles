@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.biblioteca.estructuras.ArbolLibros;
+import com.biblioteca.estructuras.ArbolUsuarios; // 🔥 NUEVO
 import com.biblioteca.modelo.Libro;
 import com.biblioteca.modelo.Usuario;
 
@@ -19,90 +21,131 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class BibliotecaServicio {
-   //LISTAS
+
+    // =========================
+    // LISTAS
+    // =========================
     private final List<Libro> libros = new ArrayList<>();
     private final List<Usuario> usuarios = new ArrayList<>();
 
-    // ESTRUCTURA DE DATOS
+    // =========================
+    // ÁRBOLES
+    // =========================
+    private final ArbolUsuarios arbolUsuarios = new ArbolUsuarios();
+    private final ArbolLibros arbolLibros = new ArbolLibros(); // 🔥 NUEVO
+
+    // =========================
+    // ESTRUCTURAS
+    // =========================
     private final Stack<String> historialDevoluciones = new Stack<>();
     private final Queue<String> registroPrestamos = new LinkedList<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @PostConstruct
     public void iniciarDatos() {
+
         registrarLibroInterno("Cien años de soledad", "García Márquez");
         registrarLibroInterno("Don Quijote", "Cervantes");
         registrarLibroInterno("El Principito", "Saint-Exupéry");
 
-        Usuario felix = registrarUsuarioInterno("Felix Santafe", "1111111111");
+        Usuario Jhon = registrarUsuarioInterno("Jhon Caballero", "1111111111");
         Usuario yenny = registrarUsuarioInterno("Yenny Serrano", "1000000000");
-        
+
         Libro dq = buscarLibroPorTitulo("Don Quijote");
-        if (felix != null && dq != null) {
-            prestarLibro(dq.getTitulo(), felix.getId());
+
+        if (Jhon != null && dq != null) {
+            prestarLibro(dq.getTitulo(), Jhon.getId());
         }
     }
 
-    // USUARIO 
+    // =========================
+    // USUARIOS
+    // =========================
+
     public String agregarUsuario(String nombre, String id) {
+
         String n = (nombre != null) ? nombre.trim() : "";
         String i = (id != null) ? id.trim() : "";
+
         if (n.isEmpty() || i.isEmpty()) return "Nombre e id son obligatorios.";
         if (buscarUsuarioPorId(i) != null) return "Ya existe ese ID.";
-        usuarios.add(new Usuario(n, i));
+
+        Usuario nuevo = new Usuario(n, i);
+        usuarios.add(nuevo);
+
+        arbolUsuarios.insertar(nuevo); // 🔥 ÁRBOL USUARIOS
+
         return null;
     }
 
     public String eliminarUsuario(String id) {
+
         Usuario u = buscarUsuarioPorId(id);
         if (u == null) return "Usuario no encontrado.";
-        libros.stream().filter(l -> l.getPrestadoA() == u).forEach(l -> {
-            l.devolver();
-            u.liberarPrestamo(l);
-        });
+
+        libros.stream()
+                .filter(l -> l.getPrestadoA() == u)
+                .forEach(l -> {
+                    l.devolver();
+                    u.liberarPrestamo(l);
+                });
+
         usuarios.remove(u);
+
         return null;
     }
-   //LISTA USUARIO
+
     public List<Usuario> listarUsuarios() {
         return new ArrayList<>(usuarios);
     }
 
     public Usuario buscarUsuarioPorId(String id) {
-        for (Usuario u : usuarios) {
-            if (u.getId().equalsIgnoreCase(id)) return u;
-        }
+        return arbolUsuarios.buscar(id);
+    }
+
+    // =========================
+    // LIBROS
+    // =========================
+
+    public String agregarLibro(String titulo, String autor) {
+
+        String t = (titulo != null) ? titulo.trim() : "";
+        String a = (autor != null) ? autor.trim() : "";
+
+        if (t.isEmpty() || a.isEmpty()) return "Datos obligatorios.";
+        if (buscarLibroPorTitulo(t) != null) return "Ya existe el libro.";
+
+        Libro nuevo = new Libro(t, a);
+
+        libros.add(nuevo);
+        arbolLibros.insertar(nuevo); // 🔥 ÁRBOL LIBROS
+
         return null;
     }
 
-    public String agregarLibro(String titulo, String autor) {
-        String t = (titulo != null) ? titulo.trim() : "";
-        String a = (autor != null) ? autor.trim() : "";
-        if (t.isEmpty() || a.isEmpty()) return "Datos obligatorios.";
-        if (buscarLibroPorTitulo(t) != null) return "Ya existe el libro.";
-        libros.add(new Libro(t, a));
-        return null;
-    }
-    //LISTA LIBRO
     public List<Libro> listarLibrosFiltrados(String consulta) {
+
         if (consulta == null || consulta.isBlank()) return new ArrayList<>(libros);
+
         String q = consulta.toLowerCase(Locale.ROOT).trim();
+
         return libros.stream()
-                .filter(l -> l.getTitulo().toLowerCase(Locale.ROOT).contains(q) || 
-                             l.getAutor().toLowerCase(Locale.ROOT).contains(q))
+                .filter(l -> l.getTitulo().toLowerCase(Locale.ROOT).contains(q)
+                        || l.getAutor().toLowerCase(Locale.ROOT).contains(q))
                 .collect(Collectors.toList());
     }
 
+    // 🔥 AHORA USA ÁRBOL DE LIBROS
     public Libro buscarLibroPorTitulo(String titulo) {
-        for (Libro l : libros) {
-            if (l.getTitulo().equalsIgnoreCase(titulo)) return l;
-        }
-        return null;
+        return arbolLibros.buscar(titulo);
     }
 
-    //  PILA  Y COLA PRESTAMO Y DEVOLUCION DE LIBRO
+    // =========================
+    // PRÉSTAMOS
+    // =========================
 
     public String prestarLibro(String tituloLibro, String usuarioId) {
+
         Libro libro = buscarLibroPorTitulo(tituloLibro);
         Usuario usuario = buscarUsuarioPorId(usuarioId);
 
@@ -113,29 +156,42 @@ public class BibliotecaServicio {
         libro.prestarA(usuario);
         usuario.registrarPrestamo(libro);
 
-        // Registro en COLA 
         String fecha = LocalDateTime.now().format(formatter);
-        registroPrestamos.add(usuario.getNombre() + " | " + fecha + " | " + libro.getTitulo() + " | PRESTAMO");
+        registroPrestamos.add(
+                usuario.getNombre() + " | " + fecha + " | " + libro.getTitulo() + " | PRESTAMO"
+        );
+
         return null;
     }
-    //DEVOLUCION
+
+    // =========================
+    // DEVOLUCIÓN
+    // =========================
+
     public String procesarDevolucion(String tituloLibro) {
+
         Libro libro = buscarLibroPorTitulo(tituloLibro);
+
         if (libro == null || libro.isDisponible()) return "No está prestado.";
 
         Usuario usuario = libro.getPrestadoA();
         String nombre = (usuario != null) ? usuario.getNombre() : "Anónimo";
-        
+
         if (usuario != null) usuario.liberarPrestamo(libro);
         libro.devolver();
 
-        // Registro en PILA 
         String fecha = LocalDateTime.now().format(formatter);
-        historialDevoluciones.push(nombre + " | " + fecha + " | " + libro.getTitulo() + " | DEVOLUCION");
+        historialDevoluciones.push(
+                nombre + " | " + fecha + " | " + libro.getTitulo() + " | DEVOLUCION"
+        );
+
         return null;
     }
 
-    //  HISTORIAL 
+    // =========================
+    // HISTORIAL
+    // =========================
+
     public List<String> obtenerHistorialPila() {
         return new ArrayList<>(historialDevoluciones);
     }
@@ -144,14 +200,25 @@ public class BibliotecaServicio {
         return new ArrayList<>(registroPrestamos);
     }
 
-    
+    // =========================
+    // INTERNOS
+    // =========================
+
     private void registrarLibroInterno(String t, String a) {
-        libros.add(new Libro(t, a));
+
+        Libro libro = new Libro(t, a);
+
+        libros.add(libro);
+        arbolLibros.insertar(libro); // 🔥 IMPORTANTE
     }
 
     private Usuario registrarUsuarioInterno(String n, String i) {
+
         Usuario u = new Usuario(n, i);
+
         usuarios.add(u);
+        arbolUsuarios.insertar(u);
+
         return u;
     }
 }

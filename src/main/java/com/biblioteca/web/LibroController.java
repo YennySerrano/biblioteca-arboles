@@ -68,7 +68,7 @@ public class LibroController {
     }
 
     @PostMapping("/libros/devolver")
-public String devolverLibro(
+    public String devolverLibro(
         @RequestParam String tituloLibro,
         RedirectAttributes redirectAttributes) {
 
